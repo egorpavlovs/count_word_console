@@ -21,37 +21,31 @@ class SiteService
           responses << Nokogiri::HTML(response.body)
           print '*'
         }
-
+        print '|'
         responses.each_with_index do |response, index|
           response_directory_name = "response_#{index}"
-          # path = [doc_dir, folder_name, response_directory_name].join('/')
-          # FileUtils.mkdir_p(path)
-          element = response.elements.last
-          element.search("//style|//script").remove
-          content = element.content
-          host = URI(url).host
-          lemming(content, "response_#{index}", host)
-          # l_path = FileUtils.mkdir_p([L_DOCS_HOME_PATH, host, "response_#{index}"].join("/"))
-          # File.open([l_path, "content.txt"].join("/"), "w") {|file| file.puts(element.content)}
+          element = response.elements.each_with_index do |element, i|
+            element.search("//style|//script").remove
+            content = element.content
+            host = URI(url).host
+            lemming(content, "response_#{index}/element_#{i}", host)
+          end
         end
     end
 
     def lemming(content, folder_name, host)
-        # all_paths = Dir["#{DOCS_HOME_PATH}/#{folder_name}/*/*/"]
-        # words = all_paths.map do |path|
-          # print '*'
-          # content = File.open([path, "content.txt"].join("/"), "r", encoding: 'ISO-8859-1:UTF-8'){ |f| f.read }
-          stop_words = File.open("stop_words", "r"){ |f| f.read }.split("\n")
-          lem = Lemmatizer.new
-          tokenize_words_lemm = tokenize(content, stop_words).map { |word| lem.lemma(word) unless word.nil? }.compact
+      stop_words = File.open("stop_words", "r"){ |f| f.read }.split("\n")
+      lem = Lemmatizer.new
+      print '*'
+      tokenize_words_lemm = tokenize(content, stop_words).map { |word|
+        lem.lemma(word) unless word.nil?
+      }.compact
 
-          l_path = FileUtils.mkdir_p([L_DOCS_HOME_PATH, host, folder_name].join("/"))
-          # puts l_path
-          tokenize_words_lemm.each{ |word|
-            File.open([l_path, "content.txt"].flatten.join("/"), "a") {|file| file.puts(word)}
-          }
-        # end
-      # end
+      l_path = FileUtils.mkdir_p([L_DOCS_HOME_PATH, host, folder_name].join("/"))
+      # puts l_path
+      tokenize_words_lemm.each{ |word|
+        File.open([l_path, "content.txt"].flatten.join("/"), "a") {|file| file.puts(word)}
+      }
     end
 
     def tokenize(content, stop_words)

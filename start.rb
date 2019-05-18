@@ -9,7 +9,7 @@ if variable == "слова"
   else
     puts "Вводи слова через пробел"
     WordsService.check_count(gets.chomp)
-    puts "Слова посчитаны, проверь папку results"
+    puts "Слова подсчитаны, проверь папку results"
   end
 elsif variable == "сайт"
   puts "Введи сайт"
